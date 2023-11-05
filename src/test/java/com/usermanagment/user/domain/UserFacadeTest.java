@@ -1,6 +1,7 @@
 package com.usermanagment.user.domain;
 
 import com.usermanagment.user.dto.RegistrationRequest;
+import com.usermanagment.user.dto.UpdateUserDto;
 import com.usermanagment.user.dto.UserDto;
 import com.usermanagment.user.exception.InvalidEmailFormatException;
 import com.usermanagment.user.exception.TakenEmailException;
@@ -17,7 +18,7 @@ class UserFacadeTest {
     UserFacade userFacade = userFacadeTestConfig.userFacadeConfigForTests();
 
     @Test
-    void should_throw_exception_when_email_address_format_is_invalid() {
+    void should_throw_exception_while_registering_when_email_address_format_is_invalid() {
         //given
         String invalidEmailExample = "invalidEmailExample";
         //when
@@ -196,5 +197,66 @@ class UserFacadeTest {
         //when
         //then
         assertThrows(UserNotFoundException.class, () -> userFacade.deleteUserById(null));
+    }
+
+    @Test
+    void should_updateUser_data() {
+        //given
+        final int userBeforeUpdateId = 1;
+        String userUsernameBeforeUpdate = userFacade.getUserById(userBeforeUpdateId).getUsername();
+        String userEmailBeforeUpdate = userFacade.getUserById(userBeforeUpdateId).getEmail();
+        //and
+        UpdateUserDto updateUserDto = UpdateUserDto.builder()
+                .username("updatedUsername")
+                .email("updated@updated.com")
+                .build();
+        //when
+        userFacade.updateUser(userBeforeUpdateId, updateUserDto);
+        UserDto userAfterUpdate = userFacade.getUserById(1);
+        //then
+        assertAll(
+                () -> assertNotEquals(userUsernameBeforeUpdate, userAfterUpdate.getUsername()),
+                () -> assertNotEquals(userEmailBeforeUpdate, userAfterUpdate.getEmail())
+        );
+    }
+
+    @Test
+    void should_throw_exception_while_updating_when_email_address_format_is_invalid() {
+        //given
+        String invalidEmailExample = "invalidEmailExample";
+        //when
+        UpdateUserDto updateUserDto = UpdateUserDto.builder()
+                .email(invalidEmailExample)
+                .build();
+        //then
+        assertThrows(InvalidEmailFormatException.class, () -> userFacade.updateUser(1, updateUserDto));
+    }
+
+    @Test
+    void should_throw_exception_while_updating_user_data_when_email_is_already_taken() {
+        //given
+        final int userBeforeUpdateId = 1;
+        String userEmailBeforeUpdate = userFacade.getUserById(userBeforeUpdateId).getEmail();
+        //when
+        UpdateUserDto updateUserDto = UpdateUserDto.builder()
+                .username("updatedUsername")
+                .email(userEmailBeforeUpdate)
+                .build();
+        //then
+        assertThrows(TakenEmailException.class, () -> userFacade.updateUser(userBeforeUpdateId, updateUserDto));
+    }
+
+    @Test
+    void should_throw_exception_while_updating_user_data_when_username_is_already_taken() {
+        //given
+        final int userBeforeUpdateId = 1;
+        String userUsernameBeforeUpdate = userFacade.getUserById(userBeforeUpdateId).getUsername();
+        //when
+        UpdateUserDto updateUserDto = UpdateUserDto.builder()
+                .username(userUsernameBeforeUpdate)
+                .email("example@updated.com")
+                .build();
+        //then
+        assertThrows(TakenUsernameException.class, () -> userFacade.updateUser(userBeforeUpdateId, updateUserDto));
     }
 }

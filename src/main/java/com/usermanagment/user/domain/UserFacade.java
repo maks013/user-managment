@@ -1,11 +1,13 @@
 package com.usermanagment.user.domain;
 
 import com.usermanagment.user.dto.RegistrationRequest;
+import com.usermanagment.user.dto.UpdateUserDto;
 import com.usermanagment.user.dto.UserDto;
 import com.usermanagment.user.exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -57,6 +59,19 @@ public class UserFacade {
             throw new UserNotFoundException();
         }
         userRepository.deleteById(id);
+    }
+
+    public void updateUser(Integer id, UpdateUserDto updateUserDto) {
+        validationService.validateEmailFormat(updateUserDto.getEmail());
+        validationService.isUsernameAvailable(updateUserDto.getUsername());
+        validationService.isEmailAvailable(updateUserDto.getEmail());
+
+        User user = userRepository.findUserById(id)
+                                  .orElseThrow(UserNotFoundException::new);
+
+        UserMapper.mapToUpdate(user, updateUserDto);
+
+        userRepository.save(user);
     }
 
 }
