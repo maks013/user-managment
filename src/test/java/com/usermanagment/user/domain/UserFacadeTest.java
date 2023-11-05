@@ -166,4 +166,35 @@ class UserFacadeTest {
         //then
         assertThrows(UserNotFoundException.class, () -> userFacade.getUserByEmail(emailOfNotExistingUser), "User not found");
     }
+
+    @Test
+    void should_delete_user_by_id() {
+        //given
+        int sizeBeforeDeleteUser = userFacade.readAllUsers().size();
+        //when
+        userFacade.deleteUserById(1);
+        int sizeAfterDeleteUser = userFacade.readAllUsers().size();
+        //then
+        assertAll(
+                () -> assertEquals(3, sizeBeforeDeleteUser),
+                () -> assertEquals(2, sizeAfterDeleteUser)
+        );
+    }
+
+    @Test
+    void should_throw_userNotFoundException_while_deleting_user_when_user_with_that_id_notExists() {
+        //given
+        int notExistingId = 125;
+        //when
+        //then
+        assertThrows(UserNotFoundException.class, () -> userFacade.deleteUserById(notExistingId));
+    }
+
+    @Test
+    void should_throw_userNotFoundException_while_deleting_user_when_id_is_null() {
+        //given
+        //when
+        //then
+        assertThrows(UserNotFoundException.class, () -> userFacade.deleteUserById(null));
+    }
 }

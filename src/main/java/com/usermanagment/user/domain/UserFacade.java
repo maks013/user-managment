@@ -52,4 +52,11 @@ public class UserFacade {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    public void deleteUserById(Integer id) {
+        if (id == null || !userRepository.existsById(id)) {
+            throw new UserNotFoundException();
+        }
+        userRepository.deleteById(id);
+    }
+
 }

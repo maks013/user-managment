@@ -1,14 +1,12 @@
 package com.usermanagment.user.domain;
 
 
-import com.usermanagment.user.dto.UserDto;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-class InMemoryUserRepository implements UserRepository {
+class InMemoryUserRepository implements UserRepository{
 
     HashMap<Integer, User> inMemoryUserDatabase = new HashMap<>();
     private static final Integer ACCOUNT_ID = 1;
@@ -22,6 +20,7 @@ class InMemoryUserRepository implements UserRepository {
         inMemoryUserDatabase.put(2, USER2);
         inMemoryUserDatabase.put(3, USER3);
     }
+
 
     @Override
     public List<User> findAll() {
@@ -49,6 +48,11 @@ class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
+    public boolean existsById(Integer id) {
+        return inMemoryUserDatabase.containsKey(id);
+    }
+
+    @Override
     public Optional<User> findUserById(Integer id) {
         return Optional.ofNullable(inMemoryUserDatabase.get(id));
     }
@@ -67,5 +71,10 @@ class InMemoryUserRepository implements UserRepository {
                 .stream()
                 .filter(user -> user.getEmail().equals(email))
                 .findFirst();
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        inMemoryUserDatabase.remove(id);
     }
 }

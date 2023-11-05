@@ -1,9 +1,10 @@
 package com.usermanagment.user.domain;
 
+
 import java.util.List;
 import java.util.Optional;
 
-interface UserRepository {
+interface UserRepository{
 
     List<User> findAll();
 
@@ -13,9 +14,13 @@ interface UserRepository {
 
     boolean existsByEmail(String email);
 
+    boolean existsById(Integer id);
+
     Optional<User> findUserById(Integer id);
 
     Optional<User> findUserByUsername(String username);
 
     Optional<User> findUserByEmail(String email);
+
+    void deleteById(Integer id);
 }
