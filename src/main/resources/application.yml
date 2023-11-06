@@ -1,0 +1,8 @@
+spring:
+  h2.console:
+    enabled: false
+  datasource:
+    url: jdbc:h2:file:./user-managment
+  jpa.hibernate:
+    ddl-auto: update
+
