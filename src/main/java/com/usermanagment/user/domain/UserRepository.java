@@ -1,26 +1,21 @@
 package com.usermanagment.user.domain;
 
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
-interface UserRepository{
-
-    List<User> findAll();
-
-    User save(User user);
+@Repository
+interface UserRepository extends JpaRepository<User, Integer> {
 
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String email);
-
-    boolean existsById(Integer id);
 
     Optional<User> findUserById(Integer id);
 
     Optional<User> findUserByUsername(String username);
 
     Optional<User> findUserByEmail(String email);
-
-    void deleteById(Integer id);
 }
