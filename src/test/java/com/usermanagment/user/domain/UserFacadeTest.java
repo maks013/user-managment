@@ -1,13 +1,9 @@
 package com.usermanagment.user.domain;
 
-import com.usermanagment.user.dto.RegistrationRequest;
-import com.usermanagment.user.dto.UpdateUserDto;
-import com.usermanagment.user.dto.UserDto;
-import com.usermanagment.user.exception.InvalidEmailFormatException;
-import com.usermanagment.user.exception.TakenEmailException;
-import com.usermanagment.user.exception.TakenUsernameException;
-import com.usermanagment.user.exception.UserNotFoundException;
+import com.usermanagment.user.dto.*;
+import com.usermanagment.user.exception.*;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,6 +12,7 @@ class UserFacadeTest {
     private final UserFacadeTestConfig userFacadeTestConfig = new UserFacadeTestConfig(new InMemoryUserRepository());
 
     UserFacade userFacade = userFacadeTestConfig.userFacadeConfigForTests();
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @Test
     void should_throw_exception_while_registering_when_email_address_format_is_invalid() {
@@ -79,7 +76,7 @@ class UserFacadeTest {
     }
 
     @Test
-    void should_register_user() {
+    void should_register_user_successfully() {
         //given
         RegistrationRequest registrationRequest = RegistrationRequest.builder()
                 .username("usernameExample1")
@@ -226,6 +223,7 @@ class UserFacadeTest {
         String invalidEmailExample = "invalidEmailExample";
         //when
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
+                .username("")
                 .email(invalidEmailExample)
                 .build();
         //then
@@ -259,4 +257,79 @@ class UserFacadeTest {
         //then
         assertThrows(TakenUsernameException.class, () -> userFacade.updateUser(userBeforeUpdateId, updateUserDto));
     }
+
+    @Test
+    void should_throw_exception_when_old_password_is_blank() {
+        //given
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .oldPassword("")
+                .newPassword("newPassword")
+                .build();
+        //when
+        //then
+        assertThrows(IncorrectPasswordException.class,
+                () -> userFacade.updatePassword(1, updatePasswordDto),
+                "Old password is blank");
+    }
+
+    @Test
+    void should_throw_exception_when_new_password_is_blank() {
+        //given
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .oldPassword("oldPassword")
+                .newPassword("")
+                .build();
+        //when
+        //then
+        assertThrows(IncorrectPasswordException.class,
+                () -> userFacade.updatePassword(1, updatePasswordDto),
+                "New password is blank");
+    }
+
+    @Test
+    void should_throw_exception_when_old_password_is_incorrect() {
+        //given
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .oldPassword("incorrectOldPassword")
+                .newPassword("newPassword")
+                .build();
+        //when
+        //then
+        assertThrows(IncorrectPasswordException.class,
+                () -> userFacade.updatePassword(1, updatePasswordDto),
+                "Password is incorrect");
+    }
+
+    @Test
+    void should_throw_exception_when_new_password_matches_old_password() {
+        //given
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .oldPassword("oldPassword")
+                .newPassword("oldPassword")
+                .build();
+        //when
+        //then
+        assertThrows(IncorrectPasswordException.class,
+                () -> userFacade.updatePassword(1, updatePasswordDto),
+                "Password is incorrect");
+    }
+
+    @Test
+    void should_update_password_successfully() {
+        //given
+        final int userId = 1;
+        final String oldPassword = "password1";
+        //and
+        String newPassword = "newPassword";
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .oldPassword(oldPassword)
+                .newPassword(newPassword)
+                .build();
+        //when
+        userFacade.updatePassword(userId, updatePasswordDto);
+        UserDtoWithPassword userAfterUpdate = userFacade.getUserWithPasswordById(userId);
+        //then
+        assertTrue(bCryptPasswordEncoder.matches(newPassword, userAfterUpdate.getPassword()));
+    }
+
 }

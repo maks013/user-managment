@@ -1,19 +1,25 @@
 package com.usermanagment.user.domain;
 
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-class InMemoryUserRepository implements UserRepository{
+class InMemoryUserRepository implements UserRepository {
 
     HashMap<Integer, User> inMemoryUserDatabase = new HashMap<>();
+    private static final BCryptPasswordEncoder bcryptPassword = new BCryptPasswordEncoder();
     private static final Integer ACCOUNT_ID = 1;
 
-    private static final User USER1 = new User(1, "user1", "password1", "email1@example.com");
-    private static final User USER2 = new User(2, "user2", "password2", "email2@example.com");
-    private static final User USER3 = new User(3, "user3", "password2", "email3@example.com");
+    private static final User USER1 = new User(1, "user1",
+            bcryptPassword.encode("password1"), "email1@example.com");
+    private static final User USER2 = new User(2, "user2",
+            bcryptPassword.encode("password2"), "email2@example.com");
+    private static final User USER3 = new User(3, "user3",
+            bcryptPassword.encode("password2"), "email3@example.com");
 
     InMemoryUserRepository() {
         inMemoryUserDatabase.put(1, USER1);

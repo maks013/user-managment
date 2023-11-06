@@ -1,6 +1,6 @@
 package com.usermanagment.user.domain;
 
-public interface UserValidationService {
+interface UserValidationService {
     void isUsernameAvailable(String username);
 
     void isEmailAvailable(String email);
