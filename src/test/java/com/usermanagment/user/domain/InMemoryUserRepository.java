@@ -21,11 +21,11 @@ class InMemoryUserRepository implements UserRepository {
     private static final Integer ACCOUNT_ID = 1;
 
     private static final User USER1 = new User(1, "user1",
-            bcryptPassword.encode("password1"), "email1@example.com");
+            bcryptPassword.encode("password1"), "email1@example.com", User.Role.USER);
     private static final User USER2 = new User(2, "user2",
-            bcryptPassword.encode("password2"), "email2@example.com");
+            bcryptPassword.encode("password2"), "email2@example.com", User.Role.USER);
     private static final User USER3 = new User(3, "user3",
-            bcryptPassword.encode("password2"), "email3@example.com");
+            bcryptPassword.encode("password2"), "email3@example.com", User.Role.USER);
 
     InMemoryUserRepository() {
         inMemoryUserDatabase.put(1, USER1);
@@ -38,66 +38,14 @@ class InMemoryUserRepository implements UserRepository {
         return new ArrayList<>(inMemoryUserDatabase.values());
     }
 
-
     @Override
-    public User save(User user) {
-        inMemoryUserDatabase.put(ACCOUNT_ID, user);
-        return user;
-    }
-
-    @Override
-    public boolean existsByUsername(String username) {
-        return inMemoryUserDatabase.values()
-                .stream()
-                .anyMatch(user -> user.getUsername().equals(username));
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        return inMemoryUserDatabase.values()
-                .stream()
-                .anyMatch(user -> user.getEmail().equals(email));
-    }
-
-    @Override
-    public boolean existsById(Integer id) {
-        return inMemoryUserDatabase.containsKey(id);
-    }
-
-    @Override
-    public Optional<User> findUserById(Integer id) {
-        return Optional.ofNullable(inMemoryUserDatabase.get(id));
-    }
-
-    @Override
-    public Optional<User> findUserByUsername(String username) {
-        return inMemoryUserDatabase.values()
-                .stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst();
-    }
-
-    @Override
-    public Optional<User> findUserByEmail(String email) {
-        return inMemoryUserDatabase.values()
-                .stream()
-                .filter(user -> user.getEmail().equals(email))
-                .findFirst();
-    }
-
-    @Override
-    public void deleteById(Integer id) {
-        inMemoryUserDatabase.remove(id);
-    }
-
-    @Override
-    public <S extends User> List<S> saveAll(Iterable<S> entities) {
+    public List<User> findAll(Sort sort) {
         return null;
     }
 
     @Override
-    public Optional<User> findById(Integer integer) {
-        return Optional.empty();
+    public Page<User> findAll(Pageable pageable) {
+        return null;
     }
 
     @Override
@@ -111,23 +59,8 @@ class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(User entity) {
-
-    }
-
-    @Override
-    public void deleteAllById(Iterable<? extends Integer> integers) {
-
-    }
-
-    @Override
-    public void deleteAll(Iterable<? extends User> entities) {
-
-    }
-
-    @Override
-    public void deleteAll() {
-
+    public <S extends User> List<S> saveAll(Iterable<S> entities) {
+        return null;
     }
 
     @Override
@@ -210,13 +143,77 @@ class InMemoryUserRepository implements UserRepository {
         return null;
     }
 
+
     @Override
-    public List<User> findAll(Sort sort) {
-        return null;
+    public User save(User user) {
+        inMemoryUserDatabase.put(ACCOUNT_ID, user);
+        return user;
     }
 
     @Override
-    public Page<User> findAll(Pageable pageable) {
-        return null;
+    public boolean existsByUsername(String username) {
+        return inMemoryUserDatabase.values()
+                .stream()
+                .anyMatch(user -> user.getUsername().equals(username));
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return inMemoryUserDatabase.values()
+                .stream()
+                .anyMatch(user -> user.getEmail().equals(email));
+    }
+
+    @Override
+    public boolean existsById(Integer id) {
+        return inMemoryUserDatabase.containsKey(id);
+    }
+
+    @Override
+    public Optional<User> findById(Integer id) {
+        return Optional.ofNullable(inMemoryUserDatabase.get(id));
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return inMemoryUserDatabase.values()
+                .stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return inMemoryUserDatabase.values()
+                .stream()
+                .filter(user -> user.getEmail().equals(email))
+                .findFirst();
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        inMemoryUserDatabase.remove(id);
+    }
+
+    @Override
+    public void delete(User entity) {
+
+    }
+
+    @Override
+    public void deleteAllById(Iterable<? extends Integer> integers) {
+
+    }
+
+    @Override
+    public void deleteAll(Iterable<? extends User> entities) {
+
+    }
+
+    @Override
+    public void deleteAll() {
+
+    }
+
+
 }
