@@ -3,6 +3,7 @@ package com.usermanagment.user.domain;
 import com.usermanagment.user.dto.*;
 import com.usermanagment.user.exception.IncorrectPasswordException;
 import com.usermanagment.user.exception.InvalidUpdate;
+import com.usermanagment.user.exception.InvalidUserIdException;
 import com.usermanagment.user.exception.UserNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,12 +22,11 @@ public class UserFacade {
         verifyAvailability(registrationRequest.getEmail(), registrationRequest.getUsername());
         verifyEmailFormat(registrationRequest.getEmail());
 
-        String encodedPassword = bCryptEncoder.encode(registrationRequest.getPassword());
-
         User user = User.builder()
                 .username(registrationRequest.getUsername())
-                .password(encodedPassword)
+                .password(bCryptEncoder.encode(registrationRequest.getPassword()))
                 .email(registrationRequest.getEmail())
+                .role(User.Role.USER)
                 .build();
 
         return userRepository.save(user).toDto();
@@ -38,38 +38,31 @@ public class UserFacade {
                 .collect(Collectors.toList());
     }
 
-    public UserDto getUserById(Integer id) {
-        return userRepository.findUserById(id)
-                .map(User::toDto)
-                .orElseThrow(UserNotFoundException::new);
-    }
-
-    public UserDtoWithPassword getUserWithPasswordById(Integer id) {
-        return userRepository.findUserById(id)
-                .map(User::toDtoWithPassword)
-                .orElseThrow(UserNotFoundException::new);
-    }
-
     public UserDto getUserByEmail(String email) {
-        return userRepository.findUserByEmail(email)
+        return userRepository.findByEmail(email)
                 .map(User::toDto)
                 .orElseThrow(UserNotFoundException::new);
     }
 
     public UserDto getUserByUsername(String username) {
-        return userRepository.findUserByUsername(username)
+        return userRepository.findByUsername(username)
                 .map(User::toDto)
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    public void deleteUserById(Integer id) {
-        if (id == null || !userRepository.existsById(id)) {
-            throw new UserNotFoundException();
-        }
+    public UserDtoWithPassword getUserWithPasswordByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(User::toDtoWithPassword)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    public void deleteUser(Integer id, String username) {
+        verifyUserOwnership(id, username);
         userRepository.deleteById(id);
     }
 
-    public void updateUser(Integer id, UpdateUserDto updateUserDto) {
+    public void updateUser(Integer id, UpdateUserDto updateUserDto, String username) {
+        verifyUserOwnership(id, username);
         if (updateUserDto.getUsername().isBlank() && updateUserDto.getEmail().isBlank()) {
             throw new InvalidUpdate();
         }
@@ -80,23 +73,24 @@ public class UserFacade {
 
         verifyAvailability(updateUserDto.getEmail(), updateUserDto.getUsername());
 
-        User user = userRepository.findUserById(id)
+        User user = userRepository.findById(id)
                 .orElseThrow(UserNotFoundException::new);
         UserMapper.mapToUpdate(user, updateUserDto);
 
         userRepository.save(user);
     }
 
-    public void updatePassword(Integer id, UpdatePasswordDto updatePasswordDto) {
+    public void updatePassword(Integer id, UpdatePasswordDto updatePasswordDto, String username) {
+        verifyUserOwnership(id, username);
         if (updatePasswordDto.getNewPassword().isBlank() || updatePasswordDto.getOldPassword().isBlank()) {
             throw new IncorrectPasswordException();
         }
 
-        User user = userRepository.findUserById(id).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
 
         if (!bCryptEncoder.matches(updatePasswordDto.getOldPassword(), user.getPassword())
                 || bCryptEncoder.matches(updatePasswordDto.getNewPassword(), user.getPassword())) {
-             throw new IncorrectPasswordException();
+            throw new IncorrectPasswordException();
         }
 
         user.setPassword(bCryptEncoder.encode(updatePasswordDto.getNewPassword()));
@@ -110,5 +104,13 @@ public class UserFacade {
 
     private void verifyEmailFormat(String email) {
         validationService.validateEmailFormat(email);
+    }
+
+    private void verifyUserOwnership(Integer id, String username) {
+        final int userId = getUserByUsername(username).getId();
+
+        if (id == null || userId != id) {
+            throw new InvalidUserIdException();
+        }
     }
 }

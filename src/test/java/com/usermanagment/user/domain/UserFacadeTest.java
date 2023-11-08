@@ -17,7 +17,7 @@ class UserFacadeTest {
     @Test
     void should_throw_exception_while_registering_when_email_address_format_is_invalid() {
         //given
-        String invalidEmailExample = "invalidEmailExample";
+        final String invalidEmailExample = "invalidEmailExample";
         //when
         RegistrationRequest registrationRequest = RegistrationRequest.builder()
                 .username("example")
@@ -32,7 +32,7 @@ class UserFacadeTest {
     @Test
     void should_throw_exception_when_username_is_already_taken() {
         //given
-        String username = "exampleUsername";
+        final String username = "exampleUsername";
         //and
         RegistrationRequest registrationRequest = RegistrationRequest.builder()
                 .username(username)
@@ -103,35 +103,14 @@ class UserFacadeTest {
     }
 
     @Test
-    void should_find_user_by_id() {
-        //given
-        //when
-        UserDto userDto = userFacade.getUserById(1);
-        //then
-        assertAll(
-                () -> assertEquals("user1", userDto.getUsername()),
-                () -> assertEquals("email1@example.com", userDto.getEmail())
-        );
-    }
-
-    @Test
-    void should_throw_exception_when_user_not_found_by_id() {
-        //given
-        final int idOfNotExistingUser = 4;
-        //when
-        //then
-        assertThrows(UserNotFoundException.class, () -> userFacade.getUserById(idOfNotExistingUser), "User not found");
-    }
-
-    @Test
     void should_find_user_by_username() {
         //given
         //when
-        UserDto userDto = userFacade.getUserByUsername("user2");
+        UserDto userDto = userFacade.getUserByUsername("user1");
         //then
         assertAll(
-                () -> assertEquals("email2@example.com", userDto.getEmail()),
-                () -> assertEquals(2, userDto.getId())
+                () -> assertEquals(1, userDto.getId()),
+                () -> assertEquals("email1@example.com", userDto.getEmail())
         );
     }
 
@@ -141,7 +120,8 @@ class UserFacadeTest {
         final String usernameOfNotExistingUser = "example";
         //when
         //then
-        assertThrows(UserNotFoundException.class, () -> userFacade.getUserByUsername(usernameOfNotExistingUser), "User not found");
+        assertThrows(UserNotFoundException.class, () -> userFacade.getUserByUsername(usernameOfNotExistingUser),
+                "User not found");
     }
 
     @Test
@@ -162,16 +142,17 @@ class UserFacadeTest {
         final String emailOfNotExistingUser = "example@example.com";
         //when
         //then
-        assertThrows(UserNotFoundException.class, () -> userFacade.getUserByEmail(emailOfNotExistingUser), "User not found");
+        assertThrows(UserNotFoundException.class, () -> userFacade.getUserByEmail(emailOfNotExistingUser),
+                "User not found");
     }
 
     @Test
-    void should_delete_user_by_id() {
+    void should_delete_user_by_username() {
         //given
-        int sizeBeforeDeleteUser = userFacade.readAllUsers().size();
+        final int sizeBeforeDeleteUser = userFacade.readAllUsers().size();
         //when
-        userFacade.deleteUserById(1);
-        int sizeAfterDeleteUser = userFacade.readAllUsers().size();
+        userFacade.deleteUser(1, "user1");
+        final int sizeAfterDeleteUser = userFacade.readAllUsers().size();
         //then
         assertAll(
                 () -> assertEquals(3, sizeBeforeDeleteUser),
@@ -180,12 +161,12 @@ class UserFacadeTest {
     }
 
     @Test
-    void should_throw_userNotFoundException_while_deleting_user_when_user_with_that_id_notExists() {
+    void should_throw_userNotFoundException_while_deleting_user_when_user_with_that_username_notExists() {
         //given
-        int notExistingId = 125;
+        final String usernameOfNotExistingUser = "example";
         //when
         //then
-        assertThrows(UserNotFoundException.class, () -> userFacade.deleteUserById(notExistingId));
+        assertThrows(UserNotFoundException.class, () -> userFacade.deleteUser(1, "example"));
     }
 
     @Test
@@ -193,69 +174,70 @@ class UserFacadeTest {
         //given
         //when
         //then
-        assertThrows(UserNotFoundException.class, () -> userFacade.deleteUserById(null));
+        assertThrows(InvalidUserIdException.class, () -> userFacade.deleteUser(null, "user1"));
     }
 
     @Test
     void should_updateUser_data() {
         //given
-        final int userBeforeUpdateId = 1;
-        String userUsernameBeforeUpdate = userFacade.getUserById(userBeforeUpdateId).getUsername();
-        String userEmailBeforeUpdate = userFacade.getUserById(userBeforeUpdateId).getEmail();
+        final String usernameBefore = "user1", emailBefore = "email1@example.com";
+        final String usernameAfter = "updatedUsername", emailAfter = "updated@updated.com";
+
         //and
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
-                .username("updatedUsername")
-                .email("updated@updated.com")
+                .username(usernameAfter)
+                .email(emailAfter)
                 .build();
         //when
-        userFacade.updateUser(userBeforeUpdateId, updateUserDto);
-        UserDto userAfterUpdate = userFacade.getUserById(1);
+        userFacade.updateUser(1, updateUserDto, usernameBefore);
+        UserDto userAfterUpdate = userFacade.getUserByUsername("updatedUsername");
         //then
         assertAll(
-                () -> assertNotEquals(userUsernameBeforeUpdate, userAfterUpdate.getUsername()),
-                () -> assertNotEquals(userEmailBeforeUpdate, userAfterUpdate.getEmail())
+                () -> assertNotEquals(usernameBefore, userAfterUpdate.getUsername()),
+                () -> assertNotEquals(emailBefore, userAfterUpdate.getEmail())
         );
     }
 
     @Test
     void should_throw_exception_while_updating_when_email_address_format_is_invalid() {
         //given
-        String invalidEmailExample = "invalidEmailExample";
+        final String invalidEmailExample = "invalidEmailExample";
         //when
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
                 .username("")
                 .email(invalidEmailExample)
                 .build();
         //then
-        assertThrows(InvalidEmailFormatException.class, () -> userFacade.updateUser(1, updateUserDto));
+        assertThrows(InvalidEmailFormatException.class, () -> userFacade.updateUser(1, updateUserDto, "user1"));
     }
 
     @Test
     void should_throw_exception_while_updating_user_data_when_email_is_already_taken() {
         //given
-        final int userBeforeUpdateId = 1;
-        String userEmailBeforeUpdate = userFacade.getUserById(userBeforeUpdateId).getEmail();
+        final String username = "user1";
+        final int userId = 1;
+        final String takenEmail = userFacade.getUserByUsername("user2").getEmail();
         //when
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
-                .username("updatedUsername")
-                .email(userEmailBeforeUpdate)
+                .username("")
+                .email(takenEmail)
                 .build();
         //then
-        assertThrows(TakenEmailException.class, () -> userFacade.updateUser(userBeforeUpdateId, updateUserDto));
+        assertThrows(TakenEmailException.class, () -> userFacade.updateUser(userId, updateUserDto, username));
     }
 
     @Test
     void should_throw_exception_while_updating_user_data_when_username_is_already_taken() {
         //given
-        final int userBeforeUpdateId = 1;
-        String userUsernameBeforeUpdate = userFacade.getUserById(userBeforeUpdateId).getUsername();
+        final String user = "user1", takenUsername = "user2";
+        final int userId = userFacade.getUserByUsername(user).getId();
         //when
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
-                .username(userUsernameBeforeUpdate)
+                .username(takenUsername)
                 .email("example@updated.com")
                 .build();
         //then
-        assertThrows(TakenUsernameException.class, () -> userFacade.updateUser(userBeforeUpdateId, updateUserDto));
+        assertThrows(TakenUsernameException.class, () -> userFacade.updateUser(userId, updateUserDto, user));
     }
 
     @Test
@@ -268,7 +250,7 @@ class UserFacadeTest {
         //when
         //then
         assertThrows(IncorrectPasswordException.class,
-                () -> userFacade.updatePassword(1, updatePasswordDto),
+                () -> userFacade.updatePassword(1, updatePasswordDto, "user1"),
                 "Old password is blank");
     }
 
@@ -282,7 +264,7 @@ class UserFacadeTest {
         //when
         //then
         assertThrows(IncorrectPasswordException.class,
-                () -> userFacade.updatePassword(1, updatePasswordDto),
+                () -> userFacade.updatePassword(1, updatePasswordDto, "user1"),
                 "New password is blank");
     }
 
@@ -296,7 +278,7 @@ class UserFacadeTest {
         //when
         //then
         assertThrows(IncorrectPasswordException.class,
-                () -> userFacade.updatePassword(1, updatePasswordDto),
+                () -> userFacade.updatePassword(1, updatePasswordDto,"user1"),
                 "Password is incorrect");
     }
 
@@ -310,7 +292,7 @@ class UserFacadeTest {
         //when
         //then
         assertThrows(IncorrectPasswordException.class,
-                () -> userFacade.updatePassword(1, updatePasswordDto),
+                () -> userFacade.updatePassword(1, updatePasswordDto, "user1"),
                 "Password is incorrect");
     }
 
@@ -318,16 +300,16 @@ class UserFacadeTest {
     void should_update_password_successfully() {
         //given
         final int userId = 1;
-        final String oldPassword = "password1";
+        final String username = "user1";
+        final String oldPassword = "password1", newPassword = "newPassword";
         //and
-        String newPassword = "newPassword";
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .oldPassword(oldPassword)
                 .newPassword(newPassword)
                 .build();
         //when
-        userFacade.updatePassword(userId, updatePasswordDto);
-        UserDtoWithPassword userAfterUpdate = userFacade.getUserWithPasswordById(userId);
+        userFacade.updatePassword(userId, updatePasswordDto, username);
+        UserDtoWithPassword userAfterUpdate = userFacade.getUserWithPasswordByUsername(username);
         //then
         assertTrue(bCryptPasswordEncoder.matches(newPassword, userAfterUpdate.getPassword()));
     }
