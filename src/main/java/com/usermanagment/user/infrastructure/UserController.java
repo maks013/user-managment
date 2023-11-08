@@ -26,7 +26,7 @@ public class UserController {
         return ResponseEntity.ok(userFacade.readAllUsers());
     }
 
-    @GetMapping("user")
+    @GetMapping("/user")
     public ResponseEntity<UserDtoWithPassword> readUser(Principal principal) {
         UserDtoWithPassword userDtoWithPassword = userFacade.getUserWithPasswordByUsername(principal.getName());
         return ResponseEntity.ok(userDtoWithPassword);
