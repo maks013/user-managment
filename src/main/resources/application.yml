@@ -6,3 +6,8 @@ spring:
   jpa.hibernate:
     ddl-auto: update
 
+auth:
+  jwt:
+    expirationDays: 30
+    secret: ${USER_SECRET}
+    issuer: user-managment-service
