@@ -21,11 +21,11 @@ class InMemoryUserRepository implements UserRepository {
     private static final Integer ACCOUNT_ID = 1;
 
     private static final User USER1 = new User(1, "user1",
-            bcryptPassword.encode("password1"), "email1@example.com", User.Role.USER);
+            bcryptPassword.encode("password1"), "email1@example.com", User.Role.USER, true);
     private static final User USER2 = new User(2, "user2",
-            bcryptPassword.encode("password2"), "email2@example.com", User.Role.USER);
+            bcryptPassword.encode("password2"), "email2@example.com", User.Role.USER,true);
     private static final User USER3 = new User(3, "user3",
-            bcryptPassword.encode("password2"), "email3@example.com", User.Role.USER);
+            bcryptPassword.encode("password2"), "email3@example.com", User.Role.USER,true);
 
     InMemoryUserRepository() {
         inMemoryUserDatabase.put(1, USER1);
@@ -188,6 +188,10 @@ class InMemoryUserRepository implements UserRepository {
                 .stream()
                 .filter(user -> user.getEmail().equals(email))
                 .findFirst();
+    }
+
+    @Override
+    public void enableAppUser(String email) {
     }
 
     @Override

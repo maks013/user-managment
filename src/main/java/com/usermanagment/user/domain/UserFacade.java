@@ -1,10 +1,7 @@
 package com.usermanagment.user.domain;
 
 import com.usermanagment.user.dto.*;
-import com.usermanagment.user.exception.IncorrectPasswordException;
-import com.usermanagment.user.exception.InvalidUpdate;
-import com.usermanagment.user.exception.InvalidUserIdException;
-import com.usermanagment.user.exception.UserNotFoundException;
+import com.usermanagment.user.exception.*;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -27,6 +24,7 @@ public class UserFacade {
                 .password(bCryptEncoder.encode(registrationRequest.getPassword()))
                 .email(registrationRequest.getEmail())
                 .role(User.Role.USER)
+                .enabled(false)
                 .build();
 
         return userRepository.save(user).toDto();
@@ -44,6 +42,10 @@ public class UserFacade {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    public User getByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+    }
+
     public UserDto getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .map(User::toDto)
@@ -58,11 +60,15 @@ public class UserFacade {
 
     public void deleteUser(Integer id, String username) {
         verifyUserOwnership(id, username);
+        verifyUserEnabled(username);
+
         userRepository.deleteById(id);
     }
 
     public void updateUser(Integer id, UpdateUserDto updateUserDto, String username) {
         verifyUserOwnership(id, username);
+        verifyUserEnabled(username);
+
         if (updateUserDto.getUsername().isBlank() && updateUserDto.getEmail().isBlank()) {
             throw new InvalidUpdate();
         }
@@ -82,6 +88,8 @@ public class UserFacade {
 
     public void updatePassword(Integer id, UpdatePasswordDto updatePasswordDto, String username) {
         verifyUserOwnership(id, username);
+        verifyUserEnabled(username);
+
         if (updatePasswordDto.getNewPassword().isBlank() || updatePasswordDto.getOldPassword().isBlank()) {
             throw new IncorrectPasswordException();
         }
@@ -95,6 +103,10 @@ public class UserFacade {
 
         user.setPassword(bCryptEncoder.encode(updatePasswordDto.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public void enableAppUser(String email) {
+        userRepository.enableAppUser(email);
     }
 
     private void verifyAvailability(String email, String username) {
@@ -113,4 +125,11 @@ public class UserFacade {
             throw new InvalidUserIdException();
         }
     }
+
+    private void verifyUserEnabled(String username) {
+        if (!getUserWithPasswordByUsername(username).getEnabled()) {
+            throw new UserNotEnabledException();
+        }
+    }
+
 }
