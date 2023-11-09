@@ -11,5 +11,6 @@ public class UserDtoWithPassword {
     private String username;
     private String password;
     private String email;
+    private Boolean enabled;
 
 }
