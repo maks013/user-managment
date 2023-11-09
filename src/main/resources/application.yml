@@ -1,0 +1,31 @@
+spring:
+  h2.console:
+    enabled: false
+  datasource:
+    url: jdbc:h2:file:./user-managment
+  jpa.hibernate:
+    ddl-auto: update
+  mail:
+    host: ${SMTP_HOST}
+    port: ${SMTP_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          socketFactory:
+            port: ${SMTP_PORT}
+            class: ${SOCKETFACTORY_CLASS}
+auth:
+  jwt:
+    expirationDays: 30
+    secret: ${USER_SECRET}
+    issuer: user-managment-service
+
+email:
+  confirmation:
+    from: ${MAIL_USERNAME}
+    subject: ${MAIL_SUBJECT}
