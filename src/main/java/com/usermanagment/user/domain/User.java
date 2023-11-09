@@ -17,7 +17,7 @@ import java.util.List;
 @Entity(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-class User implements UserDetails {
+public class User implements UserDetails {
 
     enum Role {
         ADMIN, USER
@@ -31,6 +31,7 @@ class User implements UserDetails {
     private String email;
     @Enumerated(EnumType.STRING)
     private Role role;
+    private Boolean enabled;
 
     UserDto toDto() {
         return UserDto.builder()
@@ -46,6 +47,7 @@ class User implements UserDetails {
                 .username(username)
                 .email(email)
                 .password(password)
+                .enabled(enabled)
                 .build();
     }
 
@@ -81,6 +83,6 @@ class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }
