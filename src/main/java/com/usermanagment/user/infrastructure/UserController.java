@@ -1,5 +1,6 @@
 package com.usermanagment.user.infrastructure;
 
+import com.usermanagment.confirmationtoken.domain.TokenFacade;
 import com.usermanagment.user.domain.UserFacade;
 import com.usermanagment.user.dto.UpdatePasswordDto;
 import com.usermanagment.user.dto.UpdateUserDto;
@@ -20,6 +21,7 @@ import java.util.List;
 public class UserController {
 
     private final UserFacade userFacade;
+    private final TokenFacade tokenFacade;
 
     @GetMapping
     public ResponseEntity<List<UserDto>> readAllUsers() {
@@ -36,6 +38,7 @@ public class UserController {
     public ResponseEntity<?> deleteUser(@PathVariable Integer id,
                                         Principal principal) {
         try {
+            tokenFacade.deleteToken(id);
             userFacade.deleteUser(id, principal.getName());
             return ResponseEntity.noContent().build();
         } catch (UserNotFoundException exception) {
