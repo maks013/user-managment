@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 public class User implements UserDetails {
 
-    enum Role {
+    public enum Role {
         ADMIN, USER
     }
 
