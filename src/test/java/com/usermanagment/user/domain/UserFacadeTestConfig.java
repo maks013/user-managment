@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @AllArgsConstructor
-class UserFacadeTestConfig {
+public class UserFacadeTestConfig {
 
     private final InMemoryUserRepository inMemoryUserRepository;
 
-    UserFacade userFacadeConfigForTests() {
+    public UserFacade userFacadeConfigForTests() {
         return new UserFacade(
                 inMemoryUserRepository,
                 new UserDataValidator(inMemoryUserRepository),
