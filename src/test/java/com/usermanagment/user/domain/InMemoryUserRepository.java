@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-class InMemoryUserRepository implements UserRepository {
+public class InMemoryUserRepository implements UserRepository {
 
     HashMap<Integer, User> inMemoryUserDatabase = new HashMap<>();
     private static final BCryptPasswordEncoder bcryptPassword = new BCryptPasswordEncoder();
@@ -27,7 +27,7 @@ class InMemoryUserRepository implements UserRepository {
     private static final User USER3 = new User(3, "user3",
             bcryptPassword.encode("password2"), "email3@example.com", User.Role.USER,true);
 
-    InMemoryUserRepository() {
+    public InMemoryUserRepository() {
         inMemoryUserDatabase.put(1, USER1);
         inMemoryUserDatabase.put(2, USER2);
         inMemoryUserDatabase.put(3, USER3);
