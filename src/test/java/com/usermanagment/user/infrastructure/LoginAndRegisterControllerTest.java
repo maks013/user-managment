@@ -11,7 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class LoginAndRegisterControllerTest extends UserBaseIntagration {
+class LoginAndRegisterControllerTest extends UserBaseIntegration {
 
     @Test
     @Order(1)
