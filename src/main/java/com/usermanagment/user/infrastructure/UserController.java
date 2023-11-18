@@ -57,8 +57,11 @@ public class UserController {
             return ResponseEntity.ok().build();
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (TakenEmailException | TakenUsernameException | InvalidEmailFormatException exception) {
+        } catch (TakenEmailException | TakenUsernameException |
+                InvalidEmailFormatException | InvalidUserIdException | InvalidUpdate exception) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        } catch (UserNotEnabledException exception){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
