@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
-public class UserBaseIntagration {
+public class UserBaseIntegration {
 
     @Autowired
     public ObjectMapper objectMapper;
