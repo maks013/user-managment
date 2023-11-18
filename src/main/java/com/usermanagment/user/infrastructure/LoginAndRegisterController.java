@@ -9,6 +9,9 @@ import com.usermanagment.user.dto.RegistrationRequest;
 import com.usermanagment.user.dto.UserDto;
 import com.usermanagment.user.dto.login.LoginRequestDto;
 import com.usermanagment.user.dto.login.LoginResponseDto;
+import com.usermanagment.user.exception.InvalidEmailFormatException;
+import com.usermanagment.user.exception.TakenEmailException;
+import com.usermanagment.user.exception.TakenUsernameException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,12 +40,16 @@ public class LoginAndRegisterController {
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@Valid @RequestBody RegistrationRequest registrationRequest) {
-        UserDto userDto = userFacade.registerUser(registrationRequest);
-        final String token = tokenFacade.createTokenLink(registrationRequest.getEmail());
-        emailSender.send(
-                registrationRequest.getEmail(),
-                EmailBuilder.buildEmail(registrationRequest.getUsername(), token)
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
+        try {
+            UserDto userDto = userFacade.registerUser(registrationRequest);
+            final String token = tokenFacade.createTokenLink(registrationRequest.getEmail());
+            emailSender.send(
+                    registrationRequest.getEmail(),
+                    EmailBuilder.buildEmail(registrationRequest.getUsername(), token)
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
+        } catch (InvalidEmailFormatException | TakenEmailException | TakenUsernameException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 }
