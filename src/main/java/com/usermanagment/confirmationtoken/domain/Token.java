@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name="confirmationToken")
+@Entity(name="confirmation_tokens")
 class Token {
 
     @Id
@@ -36,6 +36,7 @@ class Token {
                 .createdAt(createdAt)
                 .expiresAt(expiresAt)
                 .confirmedAt(confirmedAt)
+                .user(user.getId())
                 .build();
     }
 }

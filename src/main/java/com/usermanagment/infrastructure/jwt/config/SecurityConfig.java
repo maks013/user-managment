@@ -50,6 +50,7 @@ public class SecurityConfig {
         httpSecurity.authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/confirmation-token/**").permitAll()
+                .antMatchers("/console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .headers().frameOptions().disable()
