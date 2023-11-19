@@ -1,6 +1,5 @@
 package com.usermanagment.confirmationtoken.dto;
 
-import com.usermanagment.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,6 +14,6 @@ public class TokenDto {
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     private LocalDateTime confirmedAt;
-    private User user;
+    private Integer user;
 
 }
