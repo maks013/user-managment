@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.List;
@@ -17,9 +16,9 @@ import java.util.List;
 @Entity(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements UserDetails {
+class User implements UserDetails {
 
-    public enum Role {
+    enum Role {
         ADMIN, USER
     }
 
