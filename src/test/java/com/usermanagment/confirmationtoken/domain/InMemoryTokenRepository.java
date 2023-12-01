@@ -1,40 +1,30 @@
 package com.usermanagment.confirmationtoken.domain;
 
 import com.usermanagment.confirmationtoken.exception.TokenNotFoundException;
-import com.usermanagment.user.domain.User;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 class InMemoryTokenRepository implements TokenRepository {
 
     static HashMap<Integer, Token> inMemoryTokenDatabase = new HashMap<>();
-    private static final BCryptPasswordEncoder bcryptPassword = new BCryptPasswordEncoder();
 
-    private User USER1 = new User(1, "user1",
-            bcryptPassword.encode("password1"), "email1@example.com", User.Role.USER, true);
-    private Token TOKEN1 = new Token(1, "111",
+    private Token token1 = new Token(1, "111",
             LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), null, 1);
-
-    private User USER2 = new User(2, "user2",
-            bcryptPassword.encode("password2"), "email2@example.com", User.Role.USER, true);
-    private Token TOKEN2 = new Token(1, "222",
+    private Token token2 = new Token(1, "222",
             LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), LocalDateTime.now().plusMinutes(10), 2);
 
-    static final User USER3 = new User(3, "user3",
-            bcryptPassword.encode("password2"), "email3@example.com", User.Role.USER, true);
-
-
     InMemoryTokenRepository() {
-        inMemoryTokenDatabase.put(1, TOKEN1);
-        inMemoryTokenDatabase.put(2, TOKEN2);
+        inMemoryTokenDatabase.put(1, token1);
+        inMemoryTokenDatabase.put(2, token2);
     }
 
     @Override

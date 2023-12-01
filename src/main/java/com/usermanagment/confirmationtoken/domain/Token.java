@@ -1,7 +1,6 @@
 package com.usermanagment.confirmationtoken.domain;
 
 import com.usermanagment.confirmationtoken.dto.TokenDto;
-import com.usermanagment.user.domain.User;
 import lombok.*;
 
 import javax.persistence.*;
