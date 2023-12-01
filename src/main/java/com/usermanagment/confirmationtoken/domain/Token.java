@@ -23,11 +23,10 @@ class Token {
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     private LocalDateTime confirmedAt;
-    @ManyToOne
     @JoinColumn(
             nullable = false,
             name = "user_id")
-    private User user;
+    private Integer userId;
 
     TokenDto toDto(){
         return TokenDto.builder()
@@ -36,7 +35,7 @@ class Token {
                 .createdAt(createdAt)
                 .expiresAt(expiresAt)
                 .confirmedAt(confirmedAt)
-                .user(user.getId())
+                .userId(userId)
                 .build();
     }
 }

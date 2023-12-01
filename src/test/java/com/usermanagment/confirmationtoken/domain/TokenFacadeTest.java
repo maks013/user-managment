@@ -94,7 +94,7 @@ class TokenFacadeTest {
                 .token("expiredToken")
                 .createdAt(currentDateTime.minusHours(1))
                 .expiresAt(expiredDateTime)
-                .user(InMemoryTokenRepository.USER3)
+                .userId(3)
                 .build();
 
         repository.save(expiredToken);

@@ -191,7 +191,7 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
-    public void enableAppUser(String email) {
+    public void enableAppUser(Integer email) {
     }
 
     @Override

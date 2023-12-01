@@ -42,10 +42,6 @@ public class UserFacade {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    public User getByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
-    }
-
     public UserDto getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .map(User::toDto)
@@ -105,8 +101,8 @@ public class UserFacade {
         userRepository.save(user);
     }
 
-    public void enableAppUser(String email) {
-        userRepository.enableAppUser(email);
+    public void enableAppUser(Integer id) {
+        userRepository.enableAppUser(id);
     }
 
     private void verifyAvailability(String email, String username) {
