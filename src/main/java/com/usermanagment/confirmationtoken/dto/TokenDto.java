@@ -14,6 +14,6 @@ public class TokenDto {
     private LocalDateTime createdAt;
     private LocalDateTime expiresAt;
     private LocalDateTime confirmedAt;
-    private Integer user;
+    private Integer userId;
 
 }

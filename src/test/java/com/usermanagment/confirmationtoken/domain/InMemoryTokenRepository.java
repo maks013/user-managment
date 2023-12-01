@@ -21,12 +21,12 @@ class InMemoryTokenRepository implements TokenRepository {
     private User USER1 = new User(1, "user1",
             bcryptPassword.encode("password1"), "email1@example.com", User.Role.USER, true);
     private Token TOKEN1 = new Token(1, "111",
-            LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), null, USER1);
+            LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), null, 1);
 
     private User USER2 = new User(2, "user2",
             bcryptPassword.encode("password2"), "email2@example.com", User.Role.USER, true);
     private Token TOKEN2 = new Token(1, "222",
-            LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), LocalDateTime.now().plusMinutes(10), USER2);
+            LocalDateTime.now(), LocalDateTime.now().plusMinutes(15), LocalDateTime.now().plusMinutes(10), 2);
 
     static final User USER3 = new User(3, "user3",
             bcryptPassword.encode("password2"), "email3@example.com", User.Role.USER, true);

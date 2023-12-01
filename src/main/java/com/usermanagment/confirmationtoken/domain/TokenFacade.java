@@ -44,7 +44,7 @@ public class TokenFacade {
 
         repository.updateConfirmedAt(token, dateTimeProvider.getCurrentDateTime());
 
-        userFacade.enableAppUser(confirmationToken.getUser().getEmail());
+        userFacade.enableAppUser(confirmationToken.getUserId());
         return "confirmed";
     }
 
@@ -54,7 +54,7 @@ public class TokenFacade {
                 .token(confirmationToken)
                 .createdAt(dateTimeProvider.getCurrentDateTime())
                 .expiresAt(dateTimeProvider.getCurrentDateTime().plusMinutes(15))
-                .user(userFacade.getByEmail(email))
+                .userId(userFacade.getUserByEmail(email).getId())
                 .build();
 
         repository.save(token);
