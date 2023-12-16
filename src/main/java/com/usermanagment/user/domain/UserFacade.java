@@ -69,7 +69,7 @@ public class UserFacade {
             throw new InvalidUpdate();
         }
 
-        if (!updateUserDto.getEmail().isEmpty()) {
+        if (updateUserDto.getEmail() != null && !updateUserDto.getEmail().isBlank()){
             verifyEmailFormat(updateUserDto.getEmail());
         }
 
